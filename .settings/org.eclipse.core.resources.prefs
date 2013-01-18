@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+encoding//communigate/__init__.py=utf-8
+encoding//test/cli_methodmissing_test.py=utf-8
+encoding//test/cli_parse_cgp_test.py=utf-8
+encoding//test/cli_python_to_cgp_test.py=utf-8
+encoding/alltests.py=utf-8
