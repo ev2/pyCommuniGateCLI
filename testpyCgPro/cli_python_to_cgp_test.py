@@ -39,7 +39,7 @@ class CliPythonToCgpTest(unittest.TestCase):
         self.cli = None
 
     def assert_convertion(self, expected, source, translate = False):
-        self.assertEquals(expected, self.cli.convertOutput(source, translate))
+        self.assertEquals(expected, self.cli.convert_output(source, translate))
         
     def test_converting_none(self):
         self.assert_convertion('#NULL#', None)

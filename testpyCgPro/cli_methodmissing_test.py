@@ -33,7 +33,7 @@ class CliForTest(CLI):
         self._errorCode = CLI.CLI_CODE_OK
         self._currentCGateCommand = cmd
 
-    def parseResponse(self):
+    def parse_response(self):
         pass	        
 
 class CliMethodMissingTest(unittest.TestCase):

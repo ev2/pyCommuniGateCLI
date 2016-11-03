@@ -6,7 +6,7 @@ import sys
 
 def suite():
     modules_to_test = ('cli_parse_cgp_test', 'cli_methodmissing_test', 'cli_python_to_cgp_test', )
-    test_module = __import__('test')
+    test_module = __import__('testpyCgPro')
     alltests = unittest.TestSuite()
     
     for module in modules_to_test:
@@ -18,5 +18,5 @@ def suite():
 
 if __name__ == '__main__':
     if './src' not in sys.path:
-           sys.path.append('./src/')
+        sys.path.append('./src/')
     unittest.main(defaultTest='suite')
