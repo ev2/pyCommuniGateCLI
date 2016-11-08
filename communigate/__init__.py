@@ -7,13 +7,14 @@ import re
 import socket
 import string
 from datetime import datetime, date
+from time import time
 
 
 class CgDataException(Exception):
     def __init__(self, a_buffer, occurred_at, expecting=''):
         self.message = "Error parsing data returned from the server. The error occurred near '%s' (pos: %d) while " \
                        "expecting %s.\nThe data returned by the server follows:\n\n%s\n" % (
-                           buffer[occurred_at:10], occurred_at, expecting, buffer)
+                           a_buffer[occurred_at:10], occurred_at, expecting, a_buffer)
         self.buffer = a_buffer
         self.occurred_at = occurred_at
         self.expecting = expecting
@@ -82,6 +83,7 @@ class CLI(object):
         self._login = string.strip(login)
         self._password = string.strip(password)
         self._timeOut = int(timeout)
+        self._lastAccess = 0
         self._sp = None
         self._debug = debug
         self._logged = False  # true se já tiver autenticado na CLI
@@ -111,7 +113,8 @@ class CLI(object):
             self._sp.connect((self._peerAddress, self._peerPort))
         except socket.error, msg:
             raise CgGeneralException(
-                "Unable to connect to host %s on port %d: %s" % (self._peerAddress, self._peerPort, msg))
+                "Unable to connect to host %s on port %d: %s" % 
+                (self._peerAddress, self._peerPort, msg))
 
         response = self._sp.recv(4096)  # Se la risposta è più lunga son problemi...
         exp = re.compile(r'(<.*@.*>)')
@@ -139,15 +142,22 @@ class CLI(object):
         self.inline()
 
     def send(self, command, check_logged=True):
-        if not self._sp:
+        if not self._sp or ((time()-self._lastAccess) > self._timeOut):
+            self._connected = False
+            self._logged = False
+            print "Qui"
             self.connect()
-
-        if not self._logged and check_logged:
+        if self._logged is not True and check_logged:
             self.login()
 
         self._currentCGateCommand = command
-        self._sp.send("%s\r\n" % command)
-
+        try:
+            self._sp.send("%s\r\n" % command)
+        except:
+            raise CgGeneralException("Cannot connect")
+        else:
+            self._lastAccess = time()
+            
     def get_error_code(self):
         return self._errorCode
 
@@ -472,3 +482,9 @@ class CLI(object):
         self._sp = None
         self._connected = False
         self._logged = False
+
+if __name__ == '__main__':
+    myCLI=CLI('149.132.3.52','postmaster','ahToofee6w')
+    myCLI.login()
+    myCLI.logout()
+    

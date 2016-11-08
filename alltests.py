@@ -10,7 +10,7 @@ def suite():
     alltests = unittest.TestSuite()
     
     for module in modules_to_test:
-        __import__('test.%s' % module)
+        __import__('testpyCgPro.%s' % module)
         m = test_module.__getattribute__(module)
         alltests.addTest(unittest.findTestCases(m))
         
