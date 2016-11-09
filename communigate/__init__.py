@@ -75,7 +75,7 @@ class CLI(object):
         self.__missing_method_name = name  # Could also be a property
         return getattr(self, '__methodmissing__')
 
-    def __init__(self, peer_address, login, password, peer_port=106, timeout=60, debug=True):
+    def __init__(self, peer_address, login, password, peer_port=106, timeout=60*5-5, debug=True):
         self.__missing_method_name = None  # Hack!
         self._lineSize = 1024
         self._peerAddress = string.strip(peer_address)
@@ -116,16 +116,20 @@ class CLI(object):
                 "Unable to connect to host %s on port %d: %s" % 
                 (self._peerAddress, self._peerPort, msg))
 
-        response = self._sp.recv(4096)  # Se la risposta è più lunga son problemi...
-        exp = re.compile(r'(<.*@.*>)')
-        matches = exp.search(response)
-        if matches is None:
-            raise ValueError("No banner from the server")
-        else:
-            self._bannerCode = matches.group(1)
-
-        CLI.__connectionCounter += 1
-        self._connected = True
+        if self.parse_response():
+            exp = re.compile(r'(<.*@.*>)')
+            matches = exp.search(self._inlineResponse)
+            if matches is None:
+                raise ValueError("No banner from the server")
+            else:
+                self._bannerCode = matches.group(1)
+                CLI.__connectionCounter += 1
+                self._connected = True
+                self._lastAccess = time()
+                return
+        raise CgGeneralException("Unable to connect to host %s on port %d: %s" % 
+                (self._peerAddress, self._peerPort, msg))
+            
 
     def login(self):
         m = hashlib.md5()
@@ -145,7 +149,7 @@ class CLI(object):
         if not self._sp or ((time()-self._lastAccess) > self._timeOut):
             self._connected = False
             self._logged = False
-            print "Qui"
+            self._sp = None
             self.connect()
         if self._logged is not True and check_logged:
             self.login()
@@ -155,8 +159,7 @@ class CLI(object):
             self._sp.send("%s\r\n" % command)
         except:
             raise CgGeneralException("Cannot connect")
-        else:
-            self._lastAccess = time()
+
             
     def get_error_code(self):
         return self._errorCode
@@ -485,6 +488,6 @@ class CLI(object):
 
 if __name__ == '__main__':
     myCLI=CLI('149.132.3.52','postmaster','ahToofee6w')
-    myCLI.login()
+    print myCLI.listlists('unimib.it')
     myCLI.logout()
     
