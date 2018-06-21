@@ -1,3 +1,5 @@
 *.pyc
 .idea/
 minitest.py
+/dist/
+/build/

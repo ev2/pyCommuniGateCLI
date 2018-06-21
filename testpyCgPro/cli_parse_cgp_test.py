@@ -43,6 +43,10 @@ class CliParseCGPTest(unittest.TestCase):
         data = self.cli.parse_words('String')
         self.assertEquals('String', data)
     
+    def test_parsing_zero_string(self):
+        data = self.cli.parse_words('0')
+        self.assertEquals('0', data)
+    
     def test_pasing_quoted_strings(self):
         data = self.cli.parse_words('"Quoted String"')
         self.assertEquals('Quoted String', data)
@@ -52,8 +56,8 @@ class CliParseCGPTest(unittest.TestCase):
         self.assertEquals("a \"string\" within string", data)
 
     def test_parsing_ints(self):
-        data = self.cli.parse_words('#50')
-        self.assertEquals(50, data)
+        data = self.cli.parse_words('#12340')
+        self.assertEquals(12340, data)
 
     def test_parsing_negative_ints(self):
         data = self.cli.parse_words('#-50')
@@ -129,3 +133,7 @@ class CliParseCGPTest(unittest.TestCase):
         expected = datetime.datetime(2009, 10, 22, 15, 24, 45)
         data = self.cli.parse_words('{ServiceClasses={Guests={Changed=#T22-10-2009_15:24:45;Folders=(INBOX, "Sent Items");Source=#I[127.127.127.127];};Staff={Source=#I[127.0.0.1]:25;Name="name \\"nested\\" string";MaxAccounts=#20;};};}')
         self.assertEquals({'ServiceClasses': {'Guests': {'Changed': expected, 'Folders': ['INBOX', 'Sent Items'], 'Source': '127.127.127.127'}, 'Staff': {'Source': ('127.0.0.1', 25), 'Name': 'name "nested" string', 'MaxAccounts': 20}}}, data)
+
+if __name__ == '__main__':
+    unittest.main()
+

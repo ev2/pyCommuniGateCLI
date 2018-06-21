@@ -65,11 +65,14 @@ class CLI(object):
 
         self.send(' '.join(cmd))
 
+        #if not self.is_success():
+        #    raise CgGeneralException(self._errorMessage)
+
+        if self.parse_response():
+            return self.parse_words(self.get_words())
+
         if not self.is_success():
             raise CgGeneralException(self._errorMessage)
-
-        elif self.parse_response():
-            return self.parse_words(self.get_words())
 
     def __getattr__(self, name):
         self.__missing_method_name = name  # Could also be a property
@@ -295,12 +298,22 @@ class CLI(object):
             return ip
 
     def read_time(self):
-        if len(self._data) - self._span < 11 or self._data[self._span + 11] == '_':
-            result = datetime.strptime(self._data[self._span:self._span + 10], '%d-%m-%Y').date()
-            self._span += 10
-        else:
-            result = datetime.strptime(self._data[self._span:self._span + 19], '%d-%m-%Y_%H:%M:%S')
-            self._span += 19
+        try:
+            if self._data[self._span:self._span + 4] == 'PAST':
+                result = datetime.strptime("01-01-1970",'%d-%m-%Y').date()
+                self._span += 4
+            elif self._data[self._span:self._span + 6] == 'FUTURE':
+                result = datetime.strptime("01-01-2100",'%d-%m-%Y').date()
+                self._span += 6
+            elif len(self._data) - self._span < 11 or self._data[self._span + 11] == '_':
+                result = datetime.strptime(self._data[self._span:self._span + 10], '%d-%m-%Y').date()
+                self._span += 10
+            else:
+                result = datetime.strptime(self._data[self._span:self._span + 19], '%d-%m-%Y_%H:%M:%S')
+                self._span += 19
+        except ValueError:
+            print self._data
+            raise
 
         return result
 
@@ -476,6 +489,7 @@ class CLI(object):
         self._data = data
         self._span = 0
         self._len = len(data)
+        if self._len == 1: return self.read_word()
         return self.read_value()
 
     def logout(self):

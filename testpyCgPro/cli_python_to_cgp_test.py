@@ -73,3 +73,7 @@ class CliPythonToCgpTest(unittest.TestCase):
 
     def test_converting_datetimes(self):
         self.assert_convertion('#T15-11-1989_14:32:25', datetime.datetime(1989, 11, 15, 14, 32, 25))
+
+if __name__ == '__main__':
+    unittest.main()
+

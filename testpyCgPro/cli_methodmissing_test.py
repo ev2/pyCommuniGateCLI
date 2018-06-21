@@ -58,3 +58,8 @@ class CliMethodMissingTest(unittest.TestCase):
     def test_command_without_underscore(self):
         self.cli.getaccountsettings('root@domain.com')
         self.assertEquals('GETACCOUNTSETTINGS "root@domain.com"', self.cli._currentCGateCommand)
+
+
+if __name__ == '__main__':
+    unittest.main()
+
